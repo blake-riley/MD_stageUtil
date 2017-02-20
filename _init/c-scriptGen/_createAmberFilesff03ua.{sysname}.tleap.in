@@ -1,0 +1,45 @@
+verbosity 2
+source leaprc.protein.ff03ua
+frcmod03uahid = loadamberparams ../../c-scriptGen/implicitSolvation/ff.ff03ua/frcmod.ff03ua.HID
+
+mol = loadpdb ../../b-Design/{sysname}.{lastletter}-{laststate}.pdb
+alignaxes mol
+
+desc ">>> SS bridges <<<"
+desc "CYS A 22 - CYS A 96"
+set mol.22 connect2 mol.22.SG
+set mol.96 connect2 mol.96.SG
+crosslink mol.22 send mol.96 send
+desc mol.22.SG
+desc mol.96.SG
+desc ""
+desc "CYS A 145 - CYS A 215"
+set mol.145 connect2 mol.145.SG
+set mol.215 connect2 mol.215.SG
+crosslink mol.145 send mol.215 send
+desc mol.145.SG
+desc mol.215.SG
+desc ""
+desc "CYS B 22 - CYS B 96"
+set mol.254 connect2 mol.254.SG
+set mol.328 connect2 mol.328.SG
+crosslink mol.254 send mol.328 send
+desc mol.254.SG
+desc mol.328.SG
+desc ""
+desc "CYS B 145 - CYS B 215"
+set mol.377 connect2 mol.377.SG
+set mol.447 connect2 mol.447.SG
+crosslink mol.377 send mol.447 send
+desc mol.377.SG
+desc mol.447.SG
+desc ""
+
+desc ">>> No explicit solvation <<<"
+set default PBradii mbondi2
+
+charge mol
+check mol
+saveAmberParm mol {sysname}.prmtop {sysname}.prmcrd
+savePdb mol {sysname}.{finalletter}-posttleap.pdb
+quit

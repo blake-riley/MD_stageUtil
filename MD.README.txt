@@ -1,0 +1,284 @@
+-.	---------------------METHOD 1---------------------
+-.	---------------------(AMBER)----------------------
+pwd:/Volumes/DATA/Work/Projects/PlyC/Data/20160823.MD-lowres/
+-.	--------------------------------------------------
+
+In this simulation, we will run a united atom model of PlyC-holo, using implicit solvation. This is to provide a starting set of sampling for later REMD (and also to test speed).
+
+We will start with the 'final_model_min_cisfixed.pdb' model created by Cyril for the previous set of PlyC simulations.
+
+B.	------Design of simulation structures (./_init/b-Design)------
+1.	Copied all desolvated structures in
+	$	cp Originals/final_model_min_cisfixed.pdb PlyC.holo.a-Original.pdb
+
+2.	Removed all hydrogens, repaired HIS names and chain IDs
+	$	pymol PlyC.holo.a-Original.pdb
+	>	remove e. H
+	>	alter resn HSD, resname='HIS'
+	>	sort
+	>	alter segid P1, chain='A'
+	>	alter segid P2, chain='B'
+	>	alter segid P3, chain='C'
+	>	alter segid P4, chain='D'
+	>	alter segid P5, chain='E'
+	>	alter segid P6, chain='F'
+	>	alter segid P7, chain='G'
+	>	alter segid P8, chain='H'
+	>	alter segid P9, chain='I'
+	>	sort
+	>	save PlyC.holo.b-Cleaned.pdb, PlyC.holo.a-Original
+
+4.	Ran all structures through MolProbity (molprobity.biochem.duke.edu/index.php)
+	a.	Followed default instructions for x-ray structures
+		>	Saved as iii-MolProbity/*.molprobity.zip
+		$	unzip iii-MolProbity/*.molprobity.zip
+		#	Note that Trypsin.SFTI-TCTR did not need residue flips
+	b.	Verified all structures against the input pdbs
+		$	pymol KLK7.apo.g-Merged.pdb KLK7.SFTI-TCTR.g-Merged.pdb Trypsin.SFTI-TCTR.g-Merged.pdb iii-MolProbity/KLK7.apo.molprobity/coordinates/KLK7.apo.g-MergedFH.pdb iii-MolProbity/KLK7.SFTI-TCTR.molprobity/coordinates/KLK7.SFTI-TCTR.g-MergedFH.pdb iii-MolProbity/Trypsin.SFTI-TCTR.molprobity/coordinates/Trypsin.SFTI-TCTR.g-MergedFH.pdb
+	c.	Removed hydrogens
+		>	remove e. H
+	d.	Saved as *.h-postMolProbity.pdb
+		>	save Trypsin.SFTI-TCTR.h-postMolProbity.pdb, Trypsin.SFTI-TCTR.g-MergedFH
+		>	save KLK7.SFTI-TCTR.h-postMolProbity.pdb, KLK7.SFTI-TCTR.g-MergedFH
+		>	save KLK7.apo.h-postMolProbity.pdb, KLK7.apo.g-MergedFH
+
+5.	Renamed residues according to protonation state using pdb2pqr server (http://nbcr-222.ucsd.edu/pdb2pqr_2.1.1/)
+	a.	Submitted *.b-Cleaned.pdb to pdb2pqr2.1.1
+		Settings:	forcefield=AMBER; out_name_scheme=AMBER;
+					no_close_rebuild=yes; optimize=yes; APBSinp=yes;
+					keep_chainID=yes; use=PROPKA, pH=7
+	b.	Saved all outputs in iv-pdb2pqr/*.pdb2pqr
+	c.	Verified all structures against the input pdbs
+		$	pymol PlyC.holo.b-Cleaned.pdb iv-pdb2pqr/PlyC.holo.pdb2pqr/PlyC.holo.b_Cleaned.pqr
+		#	PlyC.holo			Flips to A//Q299, A//Q303, A//H368, A//H371, B//N4, B//N6, B//Q46, C//N6, C//N9, C//Q46, D//N4, D//N6, D//Q46, E//N9, E//N33, E//Q46, F//Q46, H//N9, H//Q14, H//Q46, I//N6
+		#						Good. 
+	d.	Removed hydrogens
+		>	remove e. H
+	e.	Reset ASH, GLH and LYN residues to ASP, GLU, and LYS
+		#	Unfortunately, ff03ua doesn't understand ASH, GLH or LYN residues
+		#	so we must reset them to their original names
+		>	alter resn ASH, resn='ASP'
+		>	alter resn GLH, resn='GLU'
+		>	alter resn LYN, resn='LYS'
+		>	sort
+	e.	Saved as PlyC.holo.c-postpdb2pqr
+		>	save PlyC.holo.c-postpdb2pqr.pdb, PlyC.holo.b_Cleaned
+
+C.	------Generating system (./_init/c-scriptGen)------
+1.	Edited _scriptgen.py to contain list of all systems, commented out unnecessary files
+2.	Replaced Amber conf files with implicitSolvation conf files
+3.	Ran scriptgen to generate all necessary scripts
+	$	./_scriptgen.py
+
+D.	------Generating system (./_init/d-ParamGen)------
+1.	Read all CYX bridges from pdb2pqr log, use to update createAmberFiles crosslink info
+	$	subl ../b-Design/iv-pdb2pqr/*pdb2pqr/stdout.txt
+	$	subl */createAmberFiles.*.tleap.in
+
+	#		NOTE: Here I am doing this manually, because there are multiple systems with different CYX bridges. 
+	#		If only one system (or if all CYX bridges are the same), it may be desirable to instead edit the crosslink info in ../c-scriptGen/_createAmberFiles.{sysname}.tleap.in and re-run _scriptGen.py (fron its directory).
+
+2.	Repeat file generation from **Part C**.
+
+2.	Build topology files
+```bash
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo $s;
+			cd $s;
+			tleap -s -f createAmberFiles.${s}.tleap.in > createAmberFiles.${s}.tleap.out;
+			cd ..;
+		done
+```
+	#		NOTE: Only issues with close contacts at this point. Shouldn't matter.
+
+3.	Convert to pdb structure
+```bash
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo $s;
+			cd $s;
+			ambpdb -p ${s}.prmtop < ${s}.prmcrd > ${s}.pdb;
+			cd ..;
+		done
+```
+
+E.	------Generating runfiles (./_init/e-ConfGen)------
+1.	Copied in all .pdbs, .prmtop, .prmcrd from last directory
+```bash
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo ${s};
+			cp ../d-ParamGen/${s}/${s}.(pdb|prmcrd|prmtop) ${s}/.;
+		done
+```
+
+3.	Created nowat indices, pdbs, psfs for later analysis:
+```bash
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo ${s};
+			cd ${s};
+			/Applications/VMD-1.9.2.app/Contents/vmd/vmd_MACOSXX86 -dispdev text -e createIndex.${s}.tcl > createIndex.${s}.out;
+			cd ..;
+		done
+```
+
+F.	------Energy minimisation, equilibration, MD (./run1)------
+1.	Copied all files into run1
+```bash
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo ${s};
+			cp ../_init/e-ConfGen/${s}/${s}.pdb \
+			../_init/e-ConfGen/${s}/${s}.prmcrd \
+			../_init/e-ConfGen/${s}/${s}.prmtop \
+			../_init/e-ConfGen/${s}/${s}.nowat.pdb \
+			../_init/e-ConfGen/${s}/${s}.nowat.psf \
+			../_init/e-ConfGen/${s}/${s}.nowat.ind "${s}/.";
+		done
+```
+
+2.	Extended runs to 1 µs (each run is 100ns)
+```bash
+		lastnum=10
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo "${s}";
+			for i in $(seq -f "%03g" 3 ${lastnum}); do
+				cp "${s}/MD.MonARCH.${s}.run1.MD002.sh" "${s}/MD.MonARCH.${s}.run1.MD${i}.sh";
+				sed -i '' \
+					-e "s/MD003/MD$(printf "%03d" $[i+1])/g" \
+					-e "s/MD002/MD${i}/g" \
+					-e "s/MD001/MD$(printf "%03d" $[i-1])/g" \
+					"${s}/MD.MonARCH.${s}.run1.MD${i}.sh";
+			done;
+		done
+```
+
+<!-- 3.	Altered number of nodes required in certain simulations.
+```bash
+	cd run1
+	for f in `grep -Rl 'nodes=4' KLK4.*`; do
+		mv "$f" "$f.tmp";
+		sed -e 's/nodes=4/nodes=8/g' < $f.tmp > $f;
+		rm $f.tmp;
+	done
+	cd ..
+``` -->
+
+3.	Copied all files into ../run2, renamed and replaced all instances of
+        'run1' with 'run2'.
+```bash
+	cp -R run1 run2
+	cd run2
+	for f in ./*/*run1*; do 
+		mv "$f" "`echo $f | sed s/run1/run2/g`"; 
+	done
+	for f in `grep -Rl run1 *`; do 
+		mv "$f" "$f.tmp"; 
+		sed -e 's/run1/run2/g' < $f.tmp > $f; 
+		rm $f.tmp; 
+	done
+	cd ..
+```
+
+4.	Copied all files into ../run3, renamed and replaced all instances of
+        'run1' with 'run3'.
+```bash
+	cp -R run1 run3
+	cd run3
+	for f in ./*/*run1*; do 
+		mv "$f" "`echo $f | sed s/run1/run3/g`"; 
+	done
+	for f in `grep -Rl run1 *`; do 
+		mv "$f" "$f.tmp"; 
+		sed -e 's/run1/run3/g' < $f.tmp > $f; 
+		rm $f.tmp; 
+	done
+	cd ..
+```
+
+5.	Pushed to MonARCH
+```bash
+	rsync -avPh 20161116.MD monarch:~/wc55/briley/Polybodies/.
+```
+
+6.	Launched jobs
+```bash
+for r in `find . -mindepth 1 -maxdepth 1 -name "run?" -type d`; do
+	r=$(basename ${r});
+	cd "${r}";
+	for s in `find . -mindepth 1 -maxdepth 1 -type d`; do
+		s=$(basename ${s});
+		cd "${s}";
+		true || echo "PWD=$(pwd)";
+		echo "${r}/${s}";
+		sbatch "MD.MonARCH.${s}.${r}.EQ000.sh";
+		cd ..;
+	done;
+	cd ..;
+done
+```
+
+<!-- UP TO HERE -->
+
+5.	Pushed to MonARCH
+```bash
+	rsync -avPh 20160823.MD-lowres monarch:~/wc55/briley/PlyC/.
+```
+
+6.	Stripped waters and concatenated trajectories using AmberTools
+```bash
+    for rf in $(find .. -maxdepth 1 -mindepth 1 -type d -name "run?"); do
+            run=$(basename ${rf});
+            for sf in $(find ${rf} -maxdepth 1 -mindepth 1 -type d); do
+                    sys=$(basename ${sf});
+                    # Make netcdf of AMBER section
+                    echo "\
+                        parm ${sf}/${sys}.prmtop
+                        trajin ${sf}/${sys}.${run}.MD???.netcdf
+                        strip :WAT parmout ${sys}.${run}.nowat.prmtop
+                        autoimage
+                        rmsd @CA,C,O,N first
+                        trajout ${sys}.${run}.allMD.nowat.netcdf netcdf
+                        go
+                        quit
+                        " | cpptraj;
+            done;
+    done
+```
+
+<!-- OLD VERSION, required `mdconvert` (`pip install --user mdtraj`) -->
+<!-- ```bash
+	for r in `find . -mindepth 1 -maxdepth 1 -type d -name 'run?'`; do
+		r=$(basename ${r});
+		echo "${r}";
+		cd "${r}";
+		for s in `find . -mindepth 1 -maxdepth 1 -type d`; do 
+			s=$(basename ${s});
+			echo "${s}";
+			cd "${s}";
+			for t in `find . -mindepth 1 -maxdepth 1 -type f -name "${s}.${r}.MD???.netcdf"`; do
+				t="${$(basename ${t})%.*}";
+				mdconvert -o "${t}.nowat.netcdf" -a "${s}.nowat.ind" "${t}.netcdf";
+				echo "${t}";
+			done;
+			find . -mindepth 1 -maxdepth 1 -type f -name "${s}.${r}.MD???.nowat.netcdf" -print0 | sort -z | xargs -r0 mdconvert -o "${s}.${r}.allMD.nowat.netcdf" ;
+			cd ..;
+		done;
+		cd ..;
+	done
+``` -->
+
+CITATIONS:
+A.3.b 	- PyMOL v1.6.0.0 Open Source
+B.2.c	- Modeller v9.10
+B.3.b	- Modeller v9.10
+B.4		- MolProbity 
+B.5		- pdb2pqr server
+D		- AmberTools 13
+E.3		- VMD 1.9.1
+F.5		- NAMD
+
+

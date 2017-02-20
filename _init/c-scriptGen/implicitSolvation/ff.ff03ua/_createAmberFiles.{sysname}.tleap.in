@@ -1,0 +1,17 @@
+verbosity 2
+source leaprc.protein.ff03ua
+frcmod03uahid = loadamberparams ../../c-scriptGen/implicitSolvation/ff.ff03ua/frcmod.ff03ua.HID
+
+mol = loadpdb ../../b-Design/{sysname}.{lastletter}-{laststate}.pdb
+alignaxes mol
+
+desc ">>> No SS bridges <<<"
+
+desc ">>> No explicit solvation <<<"
+set default PBradii mbondi2
+
+charge mol
+check mol
+saveAmberParm mol {sysname}.prmtop {sysname}.prmcrd
+savePdb mol {sysname}.{finalletter}-posttleap.pdb
+quit

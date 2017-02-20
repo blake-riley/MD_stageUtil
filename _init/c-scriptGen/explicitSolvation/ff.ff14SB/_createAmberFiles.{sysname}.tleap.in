@@ -1,0 +1,19 @@
+verbosity 2
+# source leaprc.protein.ff14SB
+source ../../c-scriptGen/leaprc.protein.ff14SBcycter	#	For cyclic backbones
+source leaprc.water.tip3p								#	For monovalent ions (ionsjc) & divalent+ (ions234lm_126)
+mol = loadpdb ../../b-Design/{sysname}.{lastletter}-{laststate}.pdb
+alignaxes mol
+
+desc ">>> No SS bridges <<<"
+
+solvateBox mol TIP3PBOX 12 
+charge mol
+addIonsRand mol Na+ 0
+addIonsRand mol Cl- 0
+
+charge mol
+check mol
+saveAmberParm mol {sysname}.prmtop {sysname}.prmcrd
+savePdb mol {sysname}.{finalletter}-posttleap.pdb
+quit

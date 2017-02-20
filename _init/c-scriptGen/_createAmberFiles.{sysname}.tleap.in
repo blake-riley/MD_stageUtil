@@ -1,0 +1,52 @@
+verbosity 2
+source leaprc.protein.ff14SB
+# source ../../c-scriptGen/leaprc.protein.ff14SBcycter	#	For cyclic backbones
+source leaprc.water.tip3p								#	For monovalent ions (ionsjc) & divalent+ (ions234lm_126)
+mol = loadpdb ../../b-Design/{sysname}.{lastletter}-{laststate}.pdb
+alignaxes mol
+
+desc ">>> SS bridges <<<"
+desc "@@@@@@@@@@@@@@@@@@@@@@@"
+desc "@@@@@@@@ ALERT @@@@@@@@"
+desc "@@@@@@@@@@@@@@@@@@@@@@@"
+desc "@@ User needs to      @"
+desc "@@ manually define    @"
+desc "@@ disulfide bridges. @"
+desc "@@@@@@@@@@@@@@@@@@@@@@@"
+desc "@@ See commented      @"
+desc "@@ example in this    @"
+desc "@@ tleap script.      @"
+desc "@@@@@@@@@@@@@@@@@@@@@@@"
+
+# desc "CYS A 22 - CYS A 96"
+# crosslink mol.22 send mol.96 send
+# desc mol.22.SG
+# desc mol.96.SG
+# desc ""
+# desc "CYS A 145 - CYS A 215"
+# crosslink mol.145 send mol.215 send
+# desc mol.145.SG
+# desc mol.215.SG
+# desc ""
+# desc "CYS B 22 - CYS B 96"
+# crosslink mol.254 send mol.328 send
+# desc mol.254.SG
+# desc mol.328.SG
+# desc ""
+# desc "CYS B 145 - CYS B 215"
+# crosslink mol.377 send mol.447 send
+# desc mol.377.SG
+# desc mol.447.SG
+# desc ""
+
+desc ">>> Explicit solvation <<<"
+solvateBox mol TIP3PBOX 12 
+charge mol
+addIonsRand mol Na+ 0
+addIonsRand mol Cl- 0
+
+charge mol
+check mol
+saveAmberParm mol {sysname}.prmtop {sysname}.prmcrd
+savePdb mol {sysname}.{finalletter}-posttleap.pdb
+quit

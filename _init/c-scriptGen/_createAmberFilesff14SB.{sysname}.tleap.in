@@ -1,0 +1,16 @@
+verbosity 2
+source leaprc.protein.ff14SB
+
+mol = loadpdb ../../b-Design/{sysname}.{lastletter}-{laststate}.pdb
+alignaxes mol
+
+desc ">>> No explicit solvation <<<"
+set default PBradii mbondi2
+
+desc ">>> No SS bridges <<<"
+
+charge mol
+check mol
+saveAmberParm mol {sysname}.prmtop {sysname}.prmcrd
+savePdb mol {sysname}.{finalletter}-posttleap.pdb
+quit
