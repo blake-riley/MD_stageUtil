@@ -109,6 +109,17 @@ E.	------Generating runfiles (./_init/e-ConfGen)------
 		for d in `find . -type d -depth 1`; do 
 			s=$(basename ${d});
 			echo ${s};
+			cp ../d-ParamGen/${s}/${s}.pdb ${s}/.;
+			cp ../d-ParamGen/${s}/${s}.prmcrd ${s}/.;
+			cp ../d-ParamGen/${s}/${s}.prmtop ${s}/.;
+		done
+```
+
+(Alternatively, ONLY if using zsh...)
+```zsh
+		for d in `find . -type d -depth 1`; do 
+			s=$(basename ${d});
+			echo ${s};
 			cp ../d-ParamGen/${s}/${s}.(pdb|prmcrd|prmtop) ${s}/.;
 		done
 ```
