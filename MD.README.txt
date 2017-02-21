@@ -167,7 +167,12 @@ F.	------Energy minimisation, equilibration, MD (./run1)------
 		done
 ```
 
-<!-- 3.	Altered number of nodes required in certain simulations.
+3.	Move up a directory.
+```bash
+		cd ..
+```
+
+<!-- 4.	Altered number of nodes required in certain simulations.
 ```bash
 	cd run1
 	for f in `grep -Rl 'nodes=4' KLK4.*`; do
@@ -178,7 +183,7 @@ F.	------Energy minimisation, equilibration, MD (./run1)------
 	cd ..
 ``` -->
 
-3.	Copied all files into ../run2, renamed and replaced all instances of
+4.	Copied all files into ../run2, renamed and replaced all instances of
         'run1' with 'run2'.
 ```bash
 	cp -R run1 run2
@@ -194,7 +199,7 @@ F.	------Energy minimisation, equilibration, MD (./run1)------
 	cd ..
 ```
 
-4.	Copied all files into ../run3, renamed and replaced all instances of
+5.	Copied all files into ../run3, renamed and replaced all instances of
         'run1' with 'run3'.
 ```bash
 	cp -R run1 run3
@@ -210,12 +215,12 @@ F.	------Energy minimisation, equilibration, MD (./run1)------
 	cd ..
 ```
 
-5.	Pushed to MonARCH
+6.	Pushed to MonARCH
 ```bash
 	rsync -avPh 20161116.MD monarch:~/wc55/briley/Polybodies/.
 ```
 
-6.	Launched jobs
+7.	Launched jobs
 ```bash
 for r in `find . -mindepth 1 -maxdepth 1 -name "run?" -type d`; do
 	r=$(basename ${r});
