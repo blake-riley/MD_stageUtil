@@ -239,6 +239,10 @@ done
 
 <!-- UP TO HERE -->
 
+4. Changed reseravation to buckle GPUs
+sed -i 's/# SBATCH --reservation=gpu_buckle/#SBATCH --reservation=gpu_buckle/g' run*/*/*.sh
+
+
 5.	Pushed to MonARCH
 ```bash
 	rsync -avPh 20160823.MD-lowres monarch:~/wc55/briley/PlyC/.
