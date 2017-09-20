@@ -248,7 +248,24 @@ sed -i 's/# SBATCH --reservation=gpu_buckle/#SBATCH --reservation=gpu_buckle/g' 
 	rsync -avPh 20160823.MD-lowres monarch:~/wc55/briley/PlyC/.
 ```
 
-6.	Stripped waters and concatenated trajectories using AmberTools
+6. Set up MonARCH with Buckle Lab modules
+
+#Have the terminal load all Buckle Lab modules upon startup
+#Open your .bash_profile for editing
+
+nano ~/.bash_profile
+
+#Add commands to load Buckle Lab modules
+
+module use /mnt/lustre/projects/wc55/sw/modulefiles
+module load python/3.5.2-intel
+module load amber/16
+
+#Save and Exit, restart your terminal
+
+
+
+7.	Stripped waters and concatenated trajectories using AmberTools
 ```bash
     for rf in $(find .. -maxdepth 1 -mindepth 1 -type d -name "run?"); do
             run=$(basename ${rf});
