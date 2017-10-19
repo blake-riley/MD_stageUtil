@@ -80,9 +80,9 @@ pmemd.cuda -O -i MD.Amber.EQ-a-min.conf \
               -x {sysname}.run1.EQ000-a.netcdf
 
 echo 'Running stage 2: Heat...'
-pmemd.cuda       -O -i MD.Amber.EQ-b-heat.conf \
 # mpiexec -n 2 \
 #   pmemd.cuda.MPI -O -i MD.Amber.EQ-b-heat.conf \
+pmemd.cuda       -O -i MD.Amber.EQ-b-heat.conf \
                     -o {sysname}.run1.EQ000-b.logout \
                     -p {sysname}.prmtop \
                     -c {sysname}.run1.fromEQ-a-min.rst \
@@ -91,9 +91,9 @@ pmemd.cuda       -O -i MD.Amber.EQ-b-heat.conf \
                     -x {sysname}.run1.EQ000-b.netcdf
 
 echo 'Running stage 3: Density...'
-pmemd.cuda       -O -i MD.Amber.EQ-c-density.conf \
 # mpiexec -n 2 \
 #   pmemd.cuda.MPI -O -i MD.Amber.EQ-c-density.conf \
+pmemd.cuda       -O -i MD.Amber.EQ-c-density.conf \
                     -o {sysname}.run1.EQ000-c.logout \
                     -p {sysname}.prmtop \
                     -c {sysname}.run1.fromEQ-b-heat.rst \
@@ -102,9 +102,9 @@ pmemd.cuda       -O -i MD.Amber.EQ-c-density.conf \
                     -x {sysname}.run1.EQ000-c.netcdf
 
 echo 'Running stage 4: Equilibration...'
-pmemd.cuda       -O -i MD.Amber.EQ-d-equil.conf \
 # mpiexec -n 2 \
 #   pmemd.cuda.MPI -O -i MD.Amber.EQ-d-equil.conf \
+pmemd.cuda       -O -i MD.Amber.EQ-d-equil.conf \
                     -o {sysname}.run1.EQ000-d.logout \
                     -p {sysname}.prmtop \
                     -c {sysname}.run1.fromEQ-c-density.rst \

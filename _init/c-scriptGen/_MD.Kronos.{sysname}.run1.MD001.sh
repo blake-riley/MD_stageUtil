@@ -68,9 +68,9 @@ cd ${{SCRATCHDIR}}
 
 # -- 3. Run MD protocol:
 echo 'Running MD...'
-pmemd.cuda       -O -i MD.Amber.MD.conf \
 # mpiexec -n 2 \
 #   pmemd.cuda.MPI -O -i MD.Amber.MD.conf \
+pmemd.cuda       -O -i MD.Amber.MD.conf \
                     -o {sysname}.run1.MD001.logout \
                     -p {sysname}.prmtop \
                     -c {sysname}.run1.fromEQ-d-equil.rst \
