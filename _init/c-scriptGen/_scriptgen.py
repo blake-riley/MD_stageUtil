@@ -72,6 +72,13 @@ files.extend([
 				('../../run1/{sysname}/', '_MD.MonARCH.{sysname}.run1.MD002.sh'),
 			])
 
+# Kronos (AMBER engine)
+# files.extend([
+# 				('../../run1/{sysname}/', '_MD.Kronos.{sysname}.run1.EQ000.sh'),
+# 				('../../run1/{sysname}/', '_MD.Kronos.{sysname}.run1.MD001.sh'),
+# 				('../../run1/{sysname}/', '_MD.Kronos.{sysname}.run1.MD002.sh'),
+# 			])
+
 # System information
 system = 	{
 				'sysname' : '',
