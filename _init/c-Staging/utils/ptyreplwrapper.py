@@ -52,12 +52,13 @@ class PtyReplWrapper(object):
                 else:
                     raise e
 
-        # Close those file-descriptors.
-        closefd(self._ptymaster)
-        closefd(self._ptyslave)
-
-        # Delete them.
-        del self._ptymaster, self._ptyslave
+        # Close those file-descriptors & delete them.
+        if hasattr(self, '_ptymaster'):
+            closefd(self._ptymaster)
+            del self._ptymaster
+        if hasattr(self, '_ptyslave'):
+            closefd(self._ptyslave)
+            del self._ptyslave
 
     def poll(self):
         return self._subproc.poll()
