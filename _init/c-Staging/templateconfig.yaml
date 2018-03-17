@@ -11,8 +11,8 @@ parameterisation: {
     water_model: "leaprc.water.tip3p",
     water_padding: 12,  # add water to box until protein has at least 12 Å to the edge of the box
     counter_ions: [
-        { Na+: 0 }, # neutralise the box with sodium ions
-        { Cl-: 0 }, # neutralise the box with chloride ions
+        { Na+: 0 },  # neutralise the box with sodium ions
+        { Cl-: 0 },  # neutralise the box with chloride ions
     ]
 }
 # Example tleap.in file
