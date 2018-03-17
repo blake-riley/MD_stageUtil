@@ -4,7 +4,7 @@ _VERSION = "0.0.1.20180307"
 
 DISULFIDE_SUGGESTION_CUTOFF = 4  # Å
 
-import os, shutil
+import os, shutil, time
 import subprocess
 #import glob
 import yaml
@@ -104,24 +104,27 @@ def main(config_file):
       "---- 3. Running tleap to create AMBER files ... ----", sep='\n')
 
     ## pytleap is installed as part of AMBERTools.
-    ## It's not doing anything special though---just writing things to a leap.cmd file, and then running this.
-    ## We can do the same better here, line by line, by wrapping tleap with subprocess.
+    ## It's not doing anything special though---just writing things to a leap.cmd file, and then running the script file.
+    ## We can do better here, and run tleap line by line.
 
-    # Try get a path for tleap
-    tleappath = shutil.which('tleap')  # Returns None if it doesn't exist
-    # Assert tleap exists, and is an executable
-    assert tleappath, "tleap wasn't found in your PATH environment variable. Quitting."
-    assert os.access(tleappath, os.X_OK), f"The tleap I found in your PATH: {tleappath} isn't an executable!? Quitting."
+    ## Unfortunately, it's not as simple as just wrapping tleap with subprocess, as tleap requires an interactive tty.
+    ## I've built a pseudo-tty (pty) repl wrapper to provide a nice "spoofed" interactive tty interface.
+    ##   # from utils.ptyreplwrapper import PtyReplWrapper
+    ## I then built a tleap wrapper so we can specifically wrap tleap (rather than just any tty-requiring program).
+    from utils.tleapwrapper import tleapInterface as TLI
 
     ## TODO: Work on this section
     # Open a tleap
-    with subprocess.Popen(tleappath, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tl:
-        try:
-            outs, errs = tl.communicate(timeout=15)
-        except TimeoutExpired:
-            tl.kill()
-            outs, errs = tl.communicate()  # Capture any output we didn't get on killing the program.
+    with TLI() as proc:
+        pass
+
+    proc = TLI().__enter__()
+    proc.runcommand('hi')
+    proc.__exit__(None, True, None)
+
+
     ## ENDTODO
+
 
     print("",
       "---- 4. Building batch script files, and configuration files ... ----", sep='\n')
