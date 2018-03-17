@@ -48,6 +48,9 @@ class tleapInterface(PtyReplWrapper):
             if buf[-3:] == "\n> ":  # If we have a prompt, we're ready.
                 ready = True
                 out += buf[:-3]  # Add everything _before_ the prompt to out.
+            elif "\tQuit\n" in buf:  # Obviously, we're quitting.
+                ready = True
+                out += buf[:-1]
             else:  # Otherwise, sleep and repeat
                 time.sleep(0.1)
                 out += buf
