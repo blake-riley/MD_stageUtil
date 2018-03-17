@@ -78,8 +78,9 @@ class PtyReplWrapper(object):
 
         if self.poll() is None:  # If the process isn't dead
             bytesin = os.write(self._ptymaster, data)
+            return bytesin  # Pass back to called the number of bytes written to the pty
 
-        return bytesin  # Pass back to called the number of bytes written to the pty
+        raise RuntimeError("Process is dead, can't send data.")
 
     def read(self):
         out = None
