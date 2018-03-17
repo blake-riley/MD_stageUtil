@@ -64,6 +64,10 @@ class PtyReplWrapper(object):
         # Get the actual poll from the subprocess.
         pollval = self._subproc.poll()
 
+        # If the process has died, time to clean up all those loose fds.
+        if pollval is not None:
+            self.__exit__(None, pollval, None)
+
         # Pass the result back up.
         return pollval
 
