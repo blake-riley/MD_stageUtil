@@ -61,14 +61,18 @@ class PtyReplWrapper(object):
             del self._ptyslave
 
     def poll(self):
-        return self._subproc.poll()
+        # Get the actual poll from the subprocess.
+        pollval = self._subproc.poll()
+
+        # Pass the result back up.
+        return pollval
 
     def write(self, data):
         # Must pass os.write a bytes-type object.
         if isinstance(data, str):
             data = data.encode()
 
-        if not self.poll():  # If the process isn't dead
+        if self.poll() is None:  # If the process isn't dead
             bytesin = os.write(self._ptymaster, data)
 
         return bytesin  # Pass back to called the number of bytes written to the pty
@@ -76,7 +80,7 @@ class PtyReplWrapper(object):
     def read(self):
         out = None
 
-        while not self.poll():  # If the process isn't dead
+        while self.poll() is None:  # If the process isn't dead
             try:
                 buf = os.read(self._ptymaster, 512).decode()  # Grab a bunch of data.
                 if not out:  # If we haven't had output yet, initialise 'out'

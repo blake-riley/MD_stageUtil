@@ -32,7 +32,7 @@ class tleapInterface(PtyReplWrapper):
         out = None
         ready = False
 
-        while not ready:
+        while self.poll() is None and not ready:
             buf = super().read()
 
             # If we get a None object back from super().read()
