@@ -15,7 +15,7 @@ import pytraj as pt
 import pdb4amber
 
 def main(config_file):
-    print("---- CONFIGURATION ----", sep='\n')
+    print("---- CONFIGURATION ----")
     print(f"file:   {config_file.name}")
 
     try:
@@ -60,7 +60,7 @@ def main(config_file):
       "---- 2a. Final cleaning of structure with 'pdb4amber'... ----", sep='\n')
 
     ## TODO: input pdb4amber to validate pdb file
-    ## pdb4amber script is at ~/.pyenv/versions/3.6.3/envs/pytraj-3.6.3/lib/python3.6/site-packages/pdb4amber/pdb4amber.py
+    ## pdb4amber script is at ~/.pyenv/versions/3.6.5/envs/pytraj-3.6.5/lib/python3.6/site-packages/pdb4amber/pdb4amber.py
 
 
     print("",
