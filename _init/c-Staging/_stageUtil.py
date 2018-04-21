@@ -3,6 +3,7 @@
 _VERSION = "0.0.1.20180307"
 
 DISULFIDE_SUGGESTION_CUTOFF = 4  # Å
+CHAIN_BREAK_CUTOFF = 2  # Å
 
 import os, shutil, time
 import subprocess
@@ -106,9 +107,70 @@ def main(config_file):
     else:
         print("  No missing heavy atoms.")
 
+
     # find possible gaps:==================================================
     print("",
       "---- 2c. Confirming chain breaks ... ----", sep='\n')
+
+    CA_atoms = []
+    C_atoms = []
+    N_atoms = []
+    gaplist = []
+
+    #  N.B.: following only finds gaps in protein chains!
+    for i, atom in enumerate(pdbstruct.topology.atoms):
+        # TODO: if using 'CH3', this will be failed with 
+        # ACE ALA ALA ALA NME system
+        # if atom.name in ['CA', 'CH3'] and atom.residue.name in RESPROT:
+        if atom.name in ['CA'] and atom.resname in pdb4amber.residue.RESPROT:
+            CA_atoms.append(i)
+        if atom.name == 'C' and atom.resname in pdb4amber.residue.RESPROT:
+            C_atoms.append(i)
+        if atom.name == 'N' and atom.resname in pdb4amber.residue.RESPROT:
+            N_atoms.append(i)
+
+    nca = len(CA_atoms)
+    ngaps = 0
+
+    for i in range(nca - 1):
+        # Looking at the C-N peptide bond distance:
+        C_atom = pdbstruct.topology.atom(C_atoms[i])
+        N_atom = pdbstruct.topology.atom(N_atoms[i + 1])
+
+        C_coord = pdbstruct.xyz[0, C_atoms[i]]
+        N_coord = pdbstruct.xyz[0, N_atoms[i+1]]
+        gap = np.linalg.norm(C_coord - N_coord)
+
+        if gap > CHAIN_BREAK_CUTOFF:
+            gaprecord = (gap, C_atom, N_atom)
+            gaplist.append(gaprecord)
+            ngaps += 1
+
+    if ngaps > 0:
+        print("  Gaps found between the following residues:")
+        for (dist, atm0, atm1) in gaplist:
+            res0 = pdbstruct.topology.residue(atm0.resid)
+            chn0 = atm0.chain
+            res1 = pdbstruct.topology.residue(atm1.resid)
+            chn1 = atm1.chain
+            print(f"    ({chn0})//{res0.name}`{res0.original_resid}/{atm0.name} -- ({chn1})//{res1.name}`{res1.original_resid}/{atm1.name} ({dist:>6.3f} Å)")
+    else:
+        print("  No gaps between residues found.")
+
+    while True:
+        yn = input("  Are the identified gaps reasonable (if not, will abort): [Y/n] ? ")
+
+        if (yn == '') or (yn in 'Yy'):
+            # User has requested default answer, or yes. Break from the input while-loop.
+            break
+        elif yn in 'Nn':
+            # User has responded unreasonable. Raise an exception to quit.
+            raise AssertionError("User decided gaps were unreasonable. Aborting.")
+            break
+        else:
+            # User hit a wrong key. Print error, loop again.
+            print("    Please answer Y or N to the prompt.")
+            continue
 
 
     # find possible S-S in the final protein:=============================
