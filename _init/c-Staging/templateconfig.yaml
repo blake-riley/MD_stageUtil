@@ -7,8 +7,11 @@ structure: {
 }
 engine: "AMBER"
 parameterisation: {
-    forcefield: "leaprc.protein.ff14SB",
-    water_model: "leaprc.water.tip3p",
+    forcefields: {
+        protein: ["leaprc.protein.ff14SB"],
+        water:   ["leaprc.water.tip3p"],
+        other:   ["leaprc.gaff2"]
+    },
     water_padding: 12,  # add water to box until protein has at least 12 Å to the edge of the box
     counter_ions: [
         { Na+: 0 },  # neutralise the box with sodium ions
