@@ -56,10 +56,6 @@ def main(config_file):
             for (begin_atom, begin_res) in solvent_mols),
           sep=', ')
 
-    print("  Suggested disulfides:")
-    disulf_idxpairs = []
-
-
     print("",
       "---- 2a. Final cleaning of structure with 'pdb4amber'... ----", sep='\n')
 
@@ -72,8 +68,6 @@ def main(config_file):
 
     # Suggest disulfides:
     def possible_disulfides():
-        # Make distance function
-
         # Get atom indices for CYX/SG atoms
         aicyxsg = [a.index for a in pdbstruct.topology.atoms
                            if (a.resname == 'CYX' and a.name == 'SG')]
@@ -88,14 +82,16 @@ def main(config_file):
 
         yield from all_disulf
 
-    for idxs, dist in possible_disulfides():
-        atm0 = pdbstruct.topology.atom(idxs[0])
+    for (idx0, idx1), dist in possible_disulfides():
+        atm0 = pdbstruct.topology.atom(idx0)
         res0 = pdbstruct.topology.residue(atm0.resid)
-        atm1 = pdbstruct.topology.atom(idxs[1])
+        chn0 = atm0.chain
+        atm1 = pdbstruct.topology.atom(idx1)
         res1 = pdbstruct.topology.residue(atm1.resid)
+        chn1 = atm1.chain
 
         while True:
-            yn = input(f"    {res0.name}`{res0.original_resid} -- {res1.name}`{res1.original_resid} ({dist:>6.3f} Å): [Y/n] ? ")
+            yn = input(f"    ({chn0})//{res0.name}`{res0.original_resid} -- ({chn1})//{res1.name}`{res1.original_resid} ({dist:>6.3f} Å): [Y/n] ? ")
 
             if (yn == '') or (yn in 'Yy'):
                 # User has requested default answer, or yes. Append this, and break from the input while-loop.
