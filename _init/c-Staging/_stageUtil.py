@@ -56,10 +56,11 @@ def main(config_file):
             for (begin_atom, begin_res) in solvent_mols),
           sep=', ')
 
-    print("",
-      "---- 2a. Final cleaning of structure with 'pdb4amber'... ----", sep='\n')
 
     # find non-standard Amber residues:===================================
+    print("",
+      "---- 2a. Checking for unsupported AMBER residue names ... ----", sep='\n')
+
     ns_resids = set()
     for residue in pdbstruct.topology.residues:
         if residue.name not in pdb4amber.residue.AMBER_SUPPORTED_RESNAMES:
@@ -73,14 +74,21 @@ def main(config_file):
             atm0 = pdbstruct.topology.atom(idx0)
             chn0 = atm0.chain
             print(f"    ({chn0})//{residue.name}`{residue.original_resid}")
-        raise KeyError("Non-standard residue names present in input pdb. Quitting.")
+    else:
+        print("  All residue names are standard AMBER resnames.")
 
-    ## TODO: input pdb4amber to validate pdb file
-    ## pdb4amber script is at ~/.pyenv/versions/3.6.5/envs/pytraj-3.6.5/lib/python3.6/site-packages/pdb4amber/pdb4amber.py
-
-
+    # count heavy atoms:==================================================
     print("",
-      "---- 2b. Double checking disulfides ... ----", sep='\n')
+      "---- 2b. Checking for missing heavy atoms ... ----", sep='\n')
+
+
+    # find possible gaps:==================================================
+    print("",
+      "---- 2c. Confirming chain breaks ... ----", sep='\n')
+
+    # find possible S-S in the final protein:=============================
+    print("",
+      "---- 2d. Confirming disulfides ... ----", sep='\n')
 
     # Suggest disulfides:
     def possible_disulfides():
