@@ -27,6 +27,7 @@ def main(config_file):
 
     print(f"system: {config['systemname']}")
 
+    # check input pdb:====================================================
     print("",
           "---- 1. Investigating structure ... ----", sep='\n')
     print(f"pdb:    {config['structure']['initial_pdb']}")
