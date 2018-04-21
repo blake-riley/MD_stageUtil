@@ -59,6 +59,22 @@ def main(config_file):
     print("",
       "---- 2a. Final cleaning of structure with 'pdb4amber'... ----", sep='\n')
 
+    # find non-standard Amber residues:===================================
+    ns_resids = set()
+    for residue in pdbstruct.topology.residues:
+        if residue.name not in pdb4amber.residue.AMBER_SUPPORTED_RESNAMES:
+            ns_resids.add(residue)
+
+    if ns_resids:
+        print("############ NON-STANDARD RESIDUE NAMES FOUND ###########")
+        print("### Amber will not understand the following residues: ###")
+        for residue in ns_resids:
+            idx0 = residue.first_atom_index
+            atm0 = pdbstruct.topology.atom(idx0)
+            chn0 = atm0.chain
+            print(f"    ({chn0})//{residue.name}`{residue.original_resid}")
+        raise KeyError("Non-standard residue names present in input pdb. Quitting.")
+
     ## TODO: input pdb4amber to validate pdb file
     ## pdb4amber script is at ~/.pyenv/versions/3.6.5/envs/pytraj-3.6.5/lib/python3.6/site-packages/pdb4amber/pdb4amber.py
 
