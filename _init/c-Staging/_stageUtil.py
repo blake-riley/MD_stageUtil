@@ -35,15 +35,26 @@ def main(config_file):
     except Exception as e:
         raise e
 
+    solvent_mols = []
+
     for i, mol in enumerate(pdbstruct.topology.mols):
-        print(f"  molecule {i}:")
         begin_atom = pdbstruct.topology.atom(mol.begin_atom)
         begin_res = pdbstruct.topology.residue(begin_atom.resid)
         end_atom = pdbstruct.topology.atom(mol.end_atom - 1)
         end_res = pdbstruct.topology.residue(end_atom.resid)
-        print(f"    residues: ({begin_res.name}`{begin_res.original_resid} -- {end_res.name}`{end_res.original_resid})\n" \
-              f"    n_resid:  {1 + end_res.index - begin_res.index}\n" \
-              f"    n_atoms:  {mol.end_atom - mol.begin_atom}")
+        if not mol.is_solvent():
+            print(f"  molecule {i}:")
+            print(f"    residues: ({begin_res.name}`{begin_res.original_resid} -- {end_res.name}`{end_res.original_resid})\n" \
+                  f"    n_resid:  {1 + end_res.index - begin_res.index}\n" \
+                  f"    n_atoms:  {mol.end_atom - mol.begin_atom}")
+        else:
+            solvent_mols.append((begin_atom, begin_res))
+
+    print(f"  {len(solvent_mols)} solvent molecules:")
+    print(f"    ", end='')
+    print(*(f"{begin_res.name}`{begin_res.original_resid}"
+            for (begin_atom, begin_res) in solvent_mols),
+          sep=', ')
 
     print("  Suggested disulfides:")
     disulf_idxpairs = []
