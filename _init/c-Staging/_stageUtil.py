@@ -86,9 +86,12 @@ def main(config_file):
     print("",
       "---- 2c. Confirming chain breaks ... ----", sep='\n')
 
+
     # find possible S-S in the final protein:=============================
     print("",
       "---- 2d. Confirming disulfides ... ----", sep='\n')
+
+    disulf_idxpairs = []
 
     # Suggest disulfides:
     def possible_disulfides():
@@ -119,7 +122,7 @@ def main(config_file):
 
             if (yn == '') or (yn in 'Yy'):
                 # User has requested default answer, or yes. Append this, and break from the input while-loop.
-                disulf_idxpairs.append(idxs)
+                disulf_idxpairs.append((idx0, idx1))
                 break
             elif yn in 'Nn':
                 # User has responded no disulfide. Break from the input while-loop.
