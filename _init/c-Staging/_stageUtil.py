@@ -77,10 +77,34 @@ def main(config_file):
     else:
         print("  All residue names are standard AMBER resnames.")
 
+
     # count heavy atoms:==================================================
     print("",
       "---- 2b. Checking for missing heavy atoms ... ----", sep='\n')
 
+    missing_atom_residues = []
+    for residue in pdbstruct.topology.residues:
+        if residue.name in pdb4amber.residue.HEAVY_ATOM_DICT:
+            res_atoms = list(pdbstruct.topology.atom(i)
+                             for i in range(residue.first_atom_index, residue.last_atom_index))
+            heavy_atoms = set(atom.name
+                              for atom in res_atoms
+                              if atom.atomic_number != 1)
+            n_heavy_atoms = len(heavy_atoms)
+            n_missing = pdb4amber.residue.HEAVY_ATOM_DICT[residue.name] - n_heavy_atoms
+            if n_missing > 0:
+                residue_collection.append([residue, n_missing])
+
+    if missing_atom_residues:
+        print("  Missing heavy atom(s) in the following residues:")
+        for residue, n_missing in missing_atom_residues:
+            idx0 = residue.first_atom_index
+            atm0 = pdbstruct.topology.atom(idx0)
+            chn0 = atm0.chain
+
+            print(f"    ({chn0})//{residue.name}`{residue.original_resid} is missing {n_missing} heavy atom(s)")
+    else:
+        print("  No missing heavy atoms.")
 
     # find possible gaps:==================================================
     print("",
