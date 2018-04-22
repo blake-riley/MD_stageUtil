@@ -29,10 +29,12 @@ class tleapInterface(PtyReplWrapper):
         # tleap always spits out a "\n> " string when it's waiting for input.
         # We will use this as a marker that tleap has finished processing a command.
         # In this read() method, we continue reading until we're ready for input.
+        #   We also break if we've been waiting for ~30 s.
         out = None
         ready = False
+        loopcount = 0
 
-        while self.poll() is None and not ready:
+        while self.poll() is None and not ready and loopcount <= 300:
             buf = super().read()
 
             # If we get a None object back from super().read()
@@ -40,6 +42,7 @@ class tleapInterface(PtyReplWrapper):
             # or has nothing to say. We should probably sleep a little.
             if not buf:
                 time.sleep(0.1)
+                loopcount += 1
                 continue
 
             if not out:  # If we haven't had output yet, initialise 'out'
@@ -51,9 +54,10 @@ class tleapInterface(PtyReplWrapper):
             elif "\tQuit\n" in buf:  # Obviously, we're quitting.
                 ready = True
                 out += buf[:-1]
-            else:  # Otherwise, sleep and repeat
+            else:  # Otherwise, got output. Reset loopcount, sleep and repeat.
                 time.sleep(0.1)
                 out += buf
+                loopcount = 0
 
         return out
 
