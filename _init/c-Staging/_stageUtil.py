@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-
-_VERSION = "0.0.1.20180307"
-
-DISULFIDE_SUGGESTION_CUTOFF = 4  # Å
-CHAIN_BREAK_CUTOFF = 2  # Å
+# -*- coding: utf-8 -*-
 
 import os
 import shutil
@@ -15,6 +11,8 @@ import itertools as itl
 import numpy as np
 import pytraj as pt
 import pdb4amber
+
+from utils import cfg as _cfg
 
 
 def main(config_file):
@@ -140,7 +138,7 @@ def main(config_file):
         N_coord = pdbstruct.xyz[0, N_atoms[i+1]]
         gap = np.linalg.norm(C_coord - N_coord)
 
-        if gap > CHAIN_BREAK_CUTOFF:
+        if gap > _cfg.CHAIN_BREAK_CUTOFF:
             gaprecord = (gap, C_atom, N_atom)
             gaplist.append(gaprecord)
             ngaps += 1
@@ -188,8 +186,8 @@ def main(config_file):
         all_disulf = zip(itl.combinations(aicyxsg, 2), itl.combinations(coords_cyxsg, 2))
         # Turn this into an iter of ((idx1, idx2), dist) structures
         all_disulf = ((idxs, np.linalg.norm(coord0 - coord1)) for (idxs, (coord0, coord1)) in all_disulf)
-        # Filter these if dist <= DISULFIDE_SUGGESTION_CUTOFF
-        all_disulf = filter(lambda id: id[1] <= DISULFIDE_SUGGESTION_CUTOFF, all_disulf)
+        # Filter these if dist <= _cfg.DISULFIDE_SUGGESTION_CUTOFF
+        all_disulf = filter(lambda id: id[1] <= _cfg.DISULFIDE_SUGGESTION_CUTOFF, all_disulf)
 
         yield from all_disulf
 
@@ -265,7 +263,7 @@ if __name__ == '__main__':
 │     |___/\__\__,_|\__, |\___|\___/ \__|_|_|     │▒▒
 │                   |___/                         │▒▒
 │                         Author:       Riley, BT │▒▒
-│                        Version: v{_VERSION:>14.14} │▒▒
+│                        Version: v{_cfg._VERSION:>14.14} │▒▒
 └─────────────────────────────────────────────────┘▒▒
   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\n""")
