@@ -1,9 +1,9 @@
 # YAML configuration for stageUtil
 ---
 
-systemname: "FN3Con.alone"
+systemname: "SYSTEMNAME"
 structure: {
-    initial_pdb: "../b-Design/FN3Con.complex.d-cyxnowat.pdb",
+    initial_pdb: "b-Design/SYSTEMNAME.POSTPDB2PQR.pdb",
     topology:    ~,
     coordinates: ~,
 }
