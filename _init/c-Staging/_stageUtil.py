@@ -13,7 +13,7 @@ from tleap import tleap
 
 def main(config_file):
     print("---- CONFIGURATION ----")
-    print(f"file:   {config_file.name}")
+    print(f"file:        {config_file.name}")
 
     try:
         config = yaml.load(config_file)
@@ -21,51 +21,65 @@ def main(config_file):
     except Exception as e:
         raise e
 
-    print(f"system: {config['systemname']}")
+    print(f"system:      {config['systemname']}")
 
-    # load pdb:===========================================================
-    try:
-        pdbstruct = pt.load(config['structure']['initial_pdb'])
-    except Exception as e:
-        raise e
+    # If we don't have a topology/coordinate file specified in the config:====
+    if not (config['structure']['topology']
+            and config['structure']['coordinates']
+            and os.path.isfile(config['structure']['topology'])
+            and os.path.isfile(config['structure']['coordinates'])):
 
-    # check input pdb:====================================================
-    print("",
-          "---- 1. Investigating structure ... ----", sep='\n')
-    print(f"pdb:    {config['structure']['initial_pdb']}")
+        # load pdb:===========================================================
+        try:
+            pdbstruct = pt.load(config['structure']['initial_pdb'])
+        except Exception as e:
+            raise e
 
-    pdbcheck.describe_pdb(pdbstruct)
+        print(f"initial_pdb: {config['systemname']}")
 
-    # find non-standard Amber residues:===================================
-    print("",
-          "---- 2a. Checking for unsupported AMBER residue names ... ----", sep='\n')
+        # check input pdb:====================================================
+        print("",
+              "---- 1. Investigating structure ... ----", sep='\n')
+        print(f"pdb:    {config['structure']['initial_pdb']}")
 
-    pdbcheck.check_unsupported_amber_residues(pdbstruct)
+        pdbcheck.describe_pdb(pdbstruct)
 
-    # count heavy atoms:==================================================
-    print("",
-          "---- 2b. Checking for missing heavy atoms ... ----", sep='\n')
+        # find non-standard Amber residues:===================================
+        print("",
+              "---- 2a. Checking for unsupported AMBER residue names ... ----", sep='\n')
 
-    pdbcheck.check_missing_heavy_atoms(pdbstruct)
+        pdbcheck.check_unsupported_amber_residues(pdbstruct)
 
-    # find possible gaps:==================================================
-    print("",
-          "---- 2c. Confirming chain breaks ... ----", sep='\n')
+        # count heavy atoms:==================================================
+        print("",
+              "---- 2b. Checking for missing heavy atoms ... ----", sep='\n')
 
-    pdbcheck.confirm_chain_breaks(pdbstruct)
+        pdbcheck.check_missing_heavy_atoms(pdbstruct)
 
-    # find possible S-S in the final protein:=============================
-    print("",
-          "---- 2d. Confirming disulfides ... ----", sep='\n')
+        # find possible gaps:==================================================
+        print("",
+              "---- 2c. Confirming chain breaks ... ----", sep='\n')
 
-    disulf_idxpairs = pdbcheck.confirm_disulfides(pdbstruct)
+        pdbcheck.confirm_chain_breaks(pdbstruct)
 
-    # run tleap:==========================================================
-    print("",
-          "---- 3. Running tleap to create AMBER files ... ----", sep='\n')
+        # find possible S-S in the final protein:=============================
+        print("",
+              "---- 2d. Confirming disulfides ... ----", sep='\n')
 
-    tleap.build_system(pdbstruct, config, disulf_idxpairs)
+        disulf_idxpairs = pdbcheck.confirm_disulfides(pdbstruct)
 
+        # run tleap:==========================================================
+        print("",
+              "---- 3. Running tleap to create AMBER files ... ----", sep='\n')
+
+        tleap.build_system(pdbstruct, config, disulf_idxpairs)
+
+    # If we do have a topology/coordinate file:===========================
+    else:
+        print(f"topology:    {config['structure']['topology']}")
+        print(f"coordinates: {config['structure']['coordinates']}")
+
+    # for everything:=====================================================
     # build batch scripts for cluster runs:===============================
     print("",
           "---- 4. Building batch script files, and configuration files ... ----", sep='\n')

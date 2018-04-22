@@ -4,6 +4,8 @@
 systemname: "FN3Con.alone"
 structure: {
     initial_pdb: "../b-Design/FN3Con.complex.d-cyxnowat.pdb",
+    topology:    ~,
+    coordinates: ~,
 }
 engine: "AMBER"
 parameterisation: {
