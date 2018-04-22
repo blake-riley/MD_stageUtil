@@ -9,6 +9,7 @@ import pytraj as pt
 from utils import cfg as _cfg
 from pdbcheck import pdbcheck
 from tleap import tleap
+from scriptbuilder import genconf
 
 
 def main(config_file):
@@ -83,6 +84,9 @@ def main(config_file):
     # build batch scripts for cluster runs:===============================
     print("",
           "---- 4. Building batch script files, and configuration files ... ----", sep='\n')
+
+    genconf.build_equilibration_confs(config)
+    genconf.build_production_conf(config)
 
     # add auxiliary scripts:==============================================
     print("",

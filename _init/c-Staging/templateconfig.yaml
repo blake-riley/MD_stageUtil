@@ -3,7 +3,7 @@
 
 systemname: "SYSTEMNAME"
 structure: {
-    initial_pdb: "b-Design/SYSTEMNAME.POSTPDB2PQR.pdb",
+    initial_pdb: "_init/b-Design/SYSTEMNAME.POSTPDB2PQR.pdb",
     topology:    ~,
     coordinates: ~,
 }
@@ -23,21 +23,26 @@ parameterisation: {
 }
 equilibration_protocols: [
     {
-        stagename: "EQ-a-min"
+        stagename: "EQ-a-min",
+        template:  "_init/c-Staging/_templates/_MD.Amber.EQ-a-min.conf",
     },
     {
-        stagename: "EQ-b-heat"
+        stagename: "EQ-b-heat",
+        template:  "_init/c-Staging/_templates/_MD.Amber.EQ-b-heat.conf",
     },
     {
-        stagename: "EQ-c-density"
+        stagename: "EQ-c-density",
+        template:  "_init/c-Staging/_templates/_MD.Amber.EQ-c-density.conf",
     },
     {
-        stagename: "EQ-d-equil"
+        stagename: "EQ-d-equil",
+        template:  "_init/c-Staging/_templates/_MD.Amber.EQ-d-equil.conf",
     }
 ]
-simulation_protocol: [
-    {
-        stagename: "MD"
-    }
-]
-
+simulation_protocol: {
+    stagename:      "MD",
+    template:       "_init/c-Staging/_templates/_MD.Amber.MD.conf",
+    dt:             0.002,  # ps
+    segment_length: 100,  # ns
+    total_length:   1000,  # ns
+}
