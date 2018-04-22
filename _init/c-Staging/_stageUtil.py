@@ -5,15 +5,17 @@ _VERSION = "0.0.1.20180307"
 DISULFIDE_SUGGESTION_CUTOFF = 4  # Å
 CHAIN_BREAK_CUTOFF = 2  # Å
 
-import os, shutil, time
+import os
+import shutil
+import time
 import subprocess
-#import glob
 import yaml
 import argparse
 import itertools as itl
 import numpy as np
 import pytraj as pt
 import pdb4amber
+
 
 def main(config_file):
     print("---- CONFIGURATION ----")
@@ -46,8 +48,8 @@ def main(config_file):
         end_res = pdbstruct.topology.residue(end_atom.resid)
         if not mol.is_solvent():
             print(f"  molecule {i}:")
-            print(f"    residues: ({begin_res.name}`{begin_res.original_resid} -- {end_res.name}`{end_res.original_resid})\n" \
-                  f"    n_resid:  {1 + end_res.index - begin_res.index}\n" \
+            print(f"    residues: ({begin_res.name}`{begin_res.original_resid} -- {end_res.name}`{end_res.original_resid})\n"
+                  f"    n_resid:  {1 + end_res.index - begin_res.index}\n"
                   f"    n_atoms:  {mol.end_atom - mol.begin_atom}")
         else:
             solvent_mols.append((begin_atom, begin_res))
@@ -58,10 +60,9 @@ def main(config_file):
             for (begin_atom, begin_res) in solvent_mols),
           sep=', ')
 
-
     # find non-standard Amber residues:===================================
     print("",
-      "---- 2a. Checking for unsupported AMBER residue names ... ----", sep='\n')
+          "---- 2a. Checking for unsupported AMBER residue names ... ----", sep='\n')
 
     ns_resids = set()
     for residue in pdbstruct.topology.residues:
@@ -79,10 +80,9 @@ def main(config_file):
     else:
         print("  All residue names are standard AMBER resnames.")
 
-
     # count heavy atoms:==================================================
     print("",
-      "---- 2b. Checking for missing heavy atoms ... ----", sep='\n')
+          "---- 2b. Checking for missing heavy atoms ... ----", sep='\n')
 
     missing_atom_residues = []
     for residue in pdbstruct.topology.residues:
@@ -108,10 +108,9 @@ def main(config_file):
     else:
         print("  No missing heavy atoms.")
 
-
     # find possible gaps:==================================================
     print("",
-      "---- 2c. Confirming chain breaks ... ----", sep='\n')
+          "---- 2c. Confirming chain breaks ... ----", sep='\n')
 
     CA_atoms = []
     C_atoms = []
@@ -120,8 +119,7 @@ def main(config_file):
 
     #  N.B.: following only finds gaps in protein chains!
     for i, atom in enumerate(pdbstruct.topology.atoms):
-        # TODO: if using 'CH3', this will be failed with 
-        # ACE ALA ALA ALA NME system
+        # TODO: if using 'CH3', this will be failed with ACE ALA ALA ALA NME system
         # if atom.name in ['CA', 'CH3'] and atom.residue.name in RESPROT:
         if atom.name in ['CA'] and atom.resname in pdb4amber.residue.RESPROT:
             CA_atoms.append(i)
@@ -173,10 +171,9 @@ def main(config_file):
             print("    Please answer Y or N to the prompt.")
             continue
 
-
     # find possible S-S in the final protein:=============================
     print("",
-      "---- 2d. Confirming disulfides ... ----", sep='\n')
+          "---- 2d. Confirming disulfides ... ----", sep='\n')
 
     disulf_idxpairs = []
 
@@ -184,7 +181,7 @@ def main(config_file):
     def possible_disulfides():
         # Get atom indices for CYX/SG atoms
         aicyxsg = [a.index for a in pdbstruct.topology.atoms
-                           if (a.resname == 'CYX' and a.name == 'SG')]
+                   if (a.resname == 'CYX' and a.name == 'SG')]
         # Get coordinates of these atoms
         coords_cyxsg = pdbstruct.xyz[0, aicyxsg, :]
         # Create an iter of ((idx1, idx2), (coord1, coord2)) structures
@@ -219,22 +216,21 @@ def main(config_file):
                 print("      Please answer Y or N to the prompt.")
                 continue
 
-    ## TODO: verify against CONECT residues in the PDB, rename residues (as appropriate) to CYX for overrides
+    # TODO: verify against CONECT residues in the PDB, rename residues (as appropriate) to CYX for overrides
 
     print("",
-      "---- 3. Running tleap to create AMBER files ... ----", sep='\n')
+          "---- 3. Running tleap to create AMBER files ... ----", sep='\n')
 
-    ## pytleap is installed as part of AMBERTools.
-    ## It's not doing anything special though---just writing things to a leap.cmd file, and then running the script file.
-    ## We can do better here, and run tleap line by line.
+    # pytleap is installed as part of AMBERTools.
+    # It's not doing anything special though---just writing things to a leap.cmd file, and then running the script file.
+    # We can do better here, and run tleap line by line.
 
-    ## Unfortunately, it's not as simple as just wrapping tleap with subprocess, as tleap requires an interactive tty.
-    ## I've built a pseudo-tty (pty) repl wrapper to provide a nice "spoofed" interactive tty interface.
-    ##   # from utils.ptyreplwrapper import PtyReplWrapper
-    ## I then built a tleap wrapper so we can specifically wrap tleap (rather than just any tty-requiring program).
+    # Unfortunately, it's not as simple as just wrapping tleap with subprocess, as tleap requires an interactive tty.
+    # I've built a pseudo-tty (pty) repl wrapper to provide a nice "spoofed" interactive tty interface.
+    #   # from utils.ptyreplwrapper import PtyReplWrapper
+    # I then built a tleap wrapper so we can specifically wrap tleap (rather than just any tty-requiring program).
     from utils.tleapwrapper import tleapInterface as TLI
 
-    ## TODO: Work on this section
     # Open a tleap
     with TLI() as proc:
         pass
@@ -244,17 +240,19 @@ def main(config_file):
     proc.__exit__(None, True, None)
 
 
-    ## ENDTODO
 
 
+    # build batch scripts for cluster runs:===============================
     print("",
-      "---- 4. Building batch script files, and configuration files ... ----", sep='\n')
+          "---- 4. Building batch script files, and configuration files ... ----", sep='\n')
 
+    # add auxiliary scripts:==============================================
     print("",
-      "---- 5. Creating auxiliary script files ... ----", sep='\n')
+          "---- 5. Creating auxiliary script files ... ----", sep='\n')
 
+    # done:===============================================================
     print("",
-      "---- Done! ----", sep='\n')
+          "---- Done! ----", sep='\n')
 
 
 if __name__ == '__main__':
