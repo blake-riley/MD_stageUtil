@@ -3,62 +3,22 @@
 
 systemname: "FN3Con.alone"
 structure: {
-        initial_pdb: "../b-Design/FN3Con.complex.d-cyxnowat.pdb"
+    initial_pdb: "../b-Design/FN3Con.complex.d-cyxnowat.pdb",
 }
 engine: "AMBER"
 parameterisation: {
     forcefields: {
-        protein: ["leaprc.protein.ff14SB"],
-        water:   ["leaprc.water.tip3p"],
-        other:   ["leaprc.gaff2"]
+        solute:  ["leaprc.protein.ff14SB"],
+        solvent: ["leaprc.water.tip3p"],
+        other:   ["leaprc.gaff2"],
     },
+    water_model:   TIP3PBOX,
     water_padding: 12,  # add water to box until protein has at least 12 Å to the edge of the box
-    counter_ions: [
-        { Na+: 0 },  # neutralise the box with sodium ions
-        { Cl-: 0 },  # neutralise the box with chloride ions
-    ]
+    ions: {
+        Na+: 0,  # neutralise the box with sodium ions
+        Cl-: 0,  # neutralise the box with chloride ions
+    },
 }
-# Example tleap.in file
-
-# verbosity 2
-# source leaprc.protein.ff14SB
-# # source ../../c-scriptGen/leaprc.protein.ff14SBcycter  #   For cyclic backbones
-# source leaprc.water.tip3p                               #   For monovalent ions (ionsjc) & divalent+ (ions234lm_126)
-# mol = loadpdb ../../b-Design/{sysname}.{lastletter}-{laststate}.pdb
-# alignaxes mol
-
-# # desc "CYS A 22 - CYS A 96"
-# # crosslink mol.22 send mol.96 send
-# # desc mol.22.SG
-# # desc mol.96.SG
-# # desc ""
-# # desc "CYS A 145 - CYS A 215"
-# # crosslink mol.145 send mol.215 send
-# # desc mol.145.SG
-# # desc mol.215.SG
-# # desc ""
-# # desc "CYS B 22 - CYS B 96"
-# # crosslink mol.254 send mol.328 send
-# # desc mol.254.SG
-# # desc mol.328.SG
-# # desc ""
-# # desc "CYS B 145 - CYS B 215"
-# # crosslink mol.377 send mol.447 send
-# # desc mol.377.SG
-# # desc mol.447.SG
-# # desc ""
-
-# desc ">>> Explicit solvation <<<"
-# solvateBox mol TIP3PBOX 12 
-# charge mol
-# addIonsRand mol Na+ 0
-# addIonsRand mol Cl- 0
-
-# charge mol
-# check mol
-# saveAmberParm mol {sysname}.prmtop {sysname}.prmcrd
-# savePdb mol {sysname}.{finalletter}-posttleap.pdb
-# quit
 equilibration_protocols: [
     {
         stagename: "EQ-a-min"

@@ -228,17 +228,30 @@ def main(config_file):
     #   # from utils.ptyreplwrapper import PtyReplWrapper
     # I then built a tleap wrapper so we can specifically wrap tleap (rather than just any tty-requiring program).
     from utils.tleapwrapper import tleapInterface as TLI
+    from tleap import tleapcommands as tlcmds
+
+    commands = []
+
+    commands.append((tlcmds.tl_set_verbosity, ()))
+    commands.append((tlcmds.tl_load_forcefields, (config,)))
+    commands.append((tlcmds.tl_load_mol, (config,)))
+    commands.append((tlcmds.tl_align_mol, ()))
+    commands.append((tlcmds.tl_crosslink_disulfides, (pdbstruct, disulf_idxpairs)))
+    commands.append((tlcmds.tl_explicit_solvate, (config,)))
+    commands.append((tlcmds.tl_get_charge, ()))
+    commands.append((tlcmds.tl_add_ions, (config,)))
+    commands.append((tlcmds.tl_check_mol, ()))
+    commands.append((tlcmds.tl_save_mol, (config,)))
 
     # Open a tleap
     with TLI() as proc:
-        pass
+        for (comm, args) in commands:
+            try:
+                comm(proc, *args)
+            except Exception as e:
+                raise e
 
-    proc = TLI().__enter__()
-    proc.runcommand('hi')
-    proc.__exit__(None, True, None)
-
-
-
+        proc.runcommand('quit')  # Cleanly quit
 
     # build batch scripts for cluster runs:===============================
     print("",
