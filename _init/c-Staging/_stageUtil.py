@@ -9,7 +9,7 @@ import pytraj as pt
 from utils import cfg as _cfg
 from pdbcheck import pdbcheck
 from tleap import tleap
-from scriptbuilder import genconf, genscript
+from scriptbuilder import genconf, genscript, writefiles
 
 
 def main(config_file):
@@ -90,6 +90,8 @@ def main(config_file):
     config['scripts'] = {}
     genscript.build_equilibration_scripts(config)
     genscript.build_production_scripts(config)
+
+    writefiles.write_all_files(config)
 
     # add auxiliary scripts:==============================================
     print("",
