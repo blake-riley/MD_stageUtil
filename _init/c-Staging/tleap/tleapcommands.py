@@ -182,3 +182,7 @@ def tl_save_mol(proc, config):
         print("=========="*6)
     else:
         print(f"      {len(retval)} lines logged.")
+
+    # add to config variable (not written!) top & conf files: ============
+    config['structure']['topology'] = f"{config['systemname']}.prmtop"
+    config['structure']['coordinates'] = f"{config['systemname']}.prmcrd"
