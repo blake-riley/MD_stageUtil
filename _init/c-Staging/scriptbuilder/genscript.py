@@ -18,7 +18,8 @@ def build_script(config, stagedict):
     script = template.format(**stagedict)
 
     # Write script to config dict
-    scriptname = f"MD.{config['engine']['host']}" \
+    scriptname = f"run{stagedict['repl_num']:02d}/" \
+                 f"MD.{config['engine']['host']}" \
                  f".{config['systemname']}" \
                  f".run{stagedict['repl_num']:02d}" \
                  f".{stagedict['stage']}{stagedict['segment_num']:03d}.sh"
