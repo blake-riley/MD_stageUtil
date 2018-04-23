@@ -7,7 +7,6 @@ structure: {
     topology:    ~,
     coordinates: ~,
 }
-engine: "AMBER"
 parameterisation: {
     forcefields: {
         solute:  ["leaprc.protein.ff14SB"],
@@ -45,4 +44,11 @@ simulation_protocol: {
     dt:             0.002,  # ps
     segment_length: 100,  # ns
     total_length:   1000,  # ns
+}
+engine: {
+    host:           "Kronos",
+    package:        "Amber",
+    user_email:     "USER.NAME@monash.edu",
+    template:       "_init/c-Staging/_templates/_MD.Kronos.sh",
+    replicates:     3,
 }
