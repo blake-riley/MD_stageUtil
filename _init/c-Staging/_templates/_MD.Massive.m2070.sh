@@ -1,30 +1,23 @@
 #!/bin/bash
 
-#SBATCH --job-name={sysname}.run1.MD002
+#SBATCH --job-name={systemname}.run{repl_num:02d}.{stage}{segment_num:03d}
 #SBATCH --account=monash006
-#SBATCH --mail-user=blake.riley@monash.edu
+#SBATCH --mail-user={user_email}
 #SBATCH --mail-type=FAIL
-#SBATCH --output="{sysname}.run1.MD002.out"
-#SBATCH --error="{sysname}.run1.MD002.err"
-# SBATCH --output=CHAP.con.MD002-%j.out
-# SBATCH --error=CHAP.con.MD002-%j.err
+#SBATCH --output="{systemname}.run{repl_num:02d}.{stage}{segment_num:03d}.out"
+#SBATCH --error="{systemname}.run{repl_num:02d}.{stage}{segment_num:03d}.err"
 
 #SBATCH --ntasks=2
-# SBATCH --ntasks-per-node=1
-# SBATCH --cpus-per-task=1
-# SBATCH --mem-per-cpu=4096
 #SBATCH --gres=gpu:m2070:2
-# SBATCH --gres=gpu:k20m:1
 
-#SBATCH --time=2-00:00:00
-# SBATCH --reservation=reservation_name
+#SBATCH --time=0-24:00:00
 
 
 #==============================================================
 #                Script  for  MASSIVE 
 #==============================================================
 
-# MD of {sysname}.run1
+# {stage}{segment_num:03d} of {systemname}.run{repl_num:02d}
 
 source /usr/local/Modules/3.2.10/init/bash
 module purge
@@ -56,9 +49,7 @@ echo '-------------------------'
 
 
 # -- 0. Create the logfiles so that they can be read during the progress of the job.
-touch {sysname}.run1.MD002.out
-touch {sysname}.run1.MD002.err
-touch {sysname}.run1.MD002.logout
+{logfiles}
 
 # -- 1. Create a temporary directory, and link it back to the submission directory.
 if [[ -n ${{SLURM_JOB_USER}} ]]; then
@@ -73,23 +64,7 @@ fi
 cd ${{SCRATCHDIR}}
 
 # -- 3. Run MD protocol:
-echo 'Running MD...'
-# pmemd.cuda       -O -i MD.Amber.MD.conf \
-mpiexec -n 2 \
-  pmemd.cuda.MPI -O -i MD.Amber.MD.conf \
-                    -o {sysname}.run1.MD002.logout \
-                    -p {sysname}.prmtop \
-                    -c {sysname}.run1.MD001.rst \
-                    -r {sysname}.run1.MD002.rst \
-                    -x {sysname}.run1.MD002.netcdf
-
-echo Strip water from .dcd
-/home/projects/Monash006/sw/vmd-1.9.2/plugins/LINUXAMD64/bin/catdcd5.1/catdcd -o {sysname}.run1.MD002.nowat.netcdf -otype netcdf -i {sysname}.nowat.ind -netcdf {sysname}.run1.MD002.netcdf
-
-echo Create allMD.nowat.dcd
-mv {sysname}.run1.allMD.nowat.dcd tmp.dcd
-/home/projects/Monash006/sw/vmd-1.9.2/plugins/LINUXAMD64/bin/catdcd5.1/catdcd -o {sysname}.run1.allMD.nowat.netcdf -otype netcdf -netcdf tmp.netcdf -netcdf {sysname}.run1.MD002.nowat.netcdf
-rm tmp.dcd
+{md_commands}
 
 # -- 4. Copy things back.
 for f in *; do [ ! -h $f ] && cp -r $f ${{SLURM_SUBMIT_DIR}}/; done
@@ -97,8 +72,8 @@ cd ${{SLURM_SUBMIT_DIR}}
 rm -rf ${{SCRATCHDIR}}
 
 # -- 5. Run the next step.
-echo Run next 50ns
-sbatch MD.Massive.{sysname}.run1.MD003.sh
+echo Run next segment
+sbatch {next_script_file}
 
 pwd
 date
