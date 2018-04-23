@@ -67,12 +67,12 @@ def build_equilibration_scripts(config):
         for eq_prot in config['equilibration_protocols']:
             commandline = f"echo 'Running {eq_prot['stagename']}...'\n" \
                           f"pmemd.cuda -O -i MD.Amber.{eq_prot['stagename']}.conf \\\n" \
-                          f"              -o {config['systemname']}.run{repl_num:02d}.{stagedict['stage']}{segment_num}.{eq_prot['stagename']}.logout \\\n" \
+                          f"              -o {config['systemname']}.run{repl_num:02d}.{stagedict['stage']}{segment_num:03d}.{eq_prot['stagename']}.logout \\\n" \
                           f"              -p {config['systemname']}.prmtop \\\n" \
                           f"              -c {restart_file} \\\n" \
                           f"              -ref {restart_file} \\\n" \
                           f"              -r {config['systemname']}.run{repl_num:02d}.from{eq_prot['stagename']}.rst \\\n" \
-                          f"              -x {config['systemname']}.run{repl_num:02d}.{stagedict['stage']}{segment_num}.{eq_prot['stagename']}.netcdf\n\n"
+                          f"              -x {config['systemname']}.run{repl_num:02d}.{stagedict['stage']}{segment_num:03d}.{eq_prot['stagename']}.netcdf\n\n"
             restart_file = f"{config['systemname']}.run{repl_num:02d}.from{eq_prot['stagename']}.rst"
             stagedict['md_commands'] += commandline
 
