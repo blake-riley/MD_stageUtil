@@ -17,7 +17,7 @@
 #             (WARNING: CURRENTLY IN ALPHA)
 #==============================================================
 
-# EM of {systemname}.run{repl_num:02d}
+# {stage}{segment_num:03d} of {systemname}.run{repl_num:02d}
 
 source /usr/share/Modules/init/bash
 module purge
