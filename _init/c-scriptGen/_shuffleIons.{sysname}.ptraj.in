@@ -1,5 +1,0 @@
-parm {sysname}.prmtop
-trajin {sysname}.{finalletter}-preShuffle.prmcrd
-randomizeions @Na+ overlap 3.0 seed 230
-randomizeions @Cl- overlap 3.0 seed 382
-trajout {sysname}.prmcrd restart
