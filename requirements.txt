@@ -1,4 +1,5 @@
 PyYAML
 numpy
+ParmED
 pdb4amber
 pytraj
