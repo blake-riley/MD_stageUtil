@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-_VERSION = "0.0.1.20180423"
+_VERSION = "0.0.2.20180423"
 
 DEBUG_TLEAP = True
 DISULFIDE_SUGGESTION_CUTOFF = 4  # Å
