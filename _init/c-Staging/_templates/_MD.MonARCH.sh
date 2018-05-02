@@ -12,7 +12,6 @@
 #SBATCH --gres=gpu:2
 
 #SBATCH --time=0-24:00:00
-#SBATCH --reservation=gpu_buckle
 
 
 #==============================================================
