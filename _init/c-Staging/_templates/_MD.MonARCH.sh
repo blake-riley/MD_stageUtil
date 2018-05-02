@@ -7,9 +7,9 @@
 #SBATCH --output="{systemname}.run{repl_num:02d}.{stage}{segment_num:03d}.out"
 #SBATCH --error="{systemname}.run{repl_num:02d}.{stage}{segment_num:03d}.err"
 
-#SBATCH --ntasks=2
+#SBATCH --ntasks=1
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 
 #SBATCH --time=0-24:00:00
 
