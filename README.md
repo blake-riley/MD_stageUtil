@@ -17,15 +17,30 @@ This project is a template directory structure (and collection of Python scripts
 
 ## How do I build a system?
 
-1. Clone this repo into a sensible directory name.
-2. Create a copy of `templateconfig.yaml`, and call it something sensible: `SYSTEM.NAME.yaml`.
-3. Edit the `SYSTEM.NAME.yaml` metadata file in your favourite text editor.
-    - If you have built a topology and coordinate file already, you should specify these in this yaml file to skip straight to script-file generation.
-4. Install the required packages for this project.
-    - You should create a Python 3 virtualenvironment first.
-    - In this virtualenvironment, run `pip install -r requirements.txt` to install the pre-requisite packages for this project.
-5. From the root directory of this repo, run `python3 _init/c-Staging/stageUtil.py SYSTEM.NAME.yaml`, which will build scripts and a directory structure for simulation on a compute resource.
-6. Push your cloned repo onto your favourite compute resource, and submit the `.sh` files to the queue as you normally would.
+There are multiple ways of doing things at each step. These different ways are listed "a.", "b.", etc. You only need to do one of these.
+
+1. Get these files.  
+    a. (With `git`): Clone this repo into a folder with a sensible name: `git clone https://gitlab.erc.monash.edu.au/BuckleLab/MD_Project_Template.git MD.20YYMMDD`  
+    b. (Without `git`): Download the ['MD_Project_Template' archive](https://gitlab.erc.monash.edu.au/BuckleLab/MD_Project_Template/-/archive/master/MD_Project_Template-master.zip), and expand to a suitable location on your computer.
+2. Copy the .pdb file of the system for which you wish to run MD into the 'MD_Project_Template' folder.
+3. Create a copy of `templateconfig.yaml`, and call it something sensible: `SYSTEM.NAME.yaml`.
+4. Edit the `SYSTEM.NAME.yaml` file in your favourite text editor to set the desired parameters for the MD you wish to perform. Most parameters can be left as their default values, but the following MUST be changed:
+    - initial_pdb: set to the location of your initial input pdb file.
+    - user_email: set to your Monash email address.
+    - host: set to "Kronos", "Monarch", or whichever compute resource you want to run your MD.
+5. Create a Python 3 virtualenvironment in which you can install the required packages for this project.  
+    a. (With `pyenv`)  
+        - Create a virtualenv: `pyenv virtualenv 3.6.6 mdprojecttemplate-3.6.6`  
+        - Activate the virtualenv: `pyenv shell mdprojecttemplate-3.6.6`  
+        - Install the prerequisites: `pip install -r requirements.txt`  
+    b. (Without `pyenv`)  
+        - Prevent version clashes between Python 2.7 and Python 3: `PYTHONPATH=''`  
+        - If needed, install the virtualenvironment package: `pip3 install virtualenv`  
+        - Create a Python 3 virtualenvironment in the current working directory: `virtualenv -p python3 .`  
+        - Activate the virtualenvironment: `source ./bin/activate`  
+        - In this virtualenvironment, install the pre-requisite packages for this project: `pip install -r requirements.txt`  
+6. From the 'MD_Project_Template' folder (the root of this repo), run `python3 _init/c-Staging/stageUtil.py SYSTEM.NAME.yaml`, which will prepare scripts and a directory structure for your MD simulation on the nominated compute resource. These will be located in a series of folders denoted 'run01', 'run02', etc, according to how many runs you generated (three by default).
+7. Copy these 'run' folders onto the computer resource specified in 'host' (Kronos, Monarch, etc.), and then submit the `.sh` files to the queue as you normally would.
 
 
 ## Contributing
