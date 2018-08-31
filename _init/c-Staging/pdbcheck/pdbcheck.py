@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import itertools as itl
+from collections import Counter
 import numpy as np
 import pdb4amber
 
@@ -177,5 +178,21 @@ def confirm_disulfides(pdbstruct):
                 # User hit a wrong key. Print error, loop again.
                 print("      Please answer Y or N to the prompt.")
                 continue
+
+    # Find all duplicate indexes listed in disulf_idxpairs.
+    idx_duplicates = [item for (item, count) in Counter(np.ravel(disulf_idxpairs)).items() if count > 1]
+
+    if idx_duplicates:
+        print("  ERROR: You have selected an invalid set of disulfides.")
+        # Inform user of all duplicate residue entries.
+        for idx in idx_duplicates:
+            atm = pdbstruct.topology.atom(idx)
+            res = pdbstruct.topology.residue(atm.resid)
+            chn = atm.chain
+            print(f"    ({chn})//{res.name}`{res.original_resid} appears more than once.")
+        print("  Please select disulfides again.")
+
+        # Get user to repeat.
+        disulf_idxpairs = confirm_disulfides(pdbstruct)
 
     return disulf_idxpairs
