@@ -65,7 +65,9 @@ def main(config_file):
 
         # find possible S-S in the final protein:=============================
         print("",
-              "---- 2d. Confirming disulfides ... ----", sep='\n')
+              "---- 2d. Confirming disulfides ...              ----",
+              "----     (will suggest all SG pairs within {} Å) ----".format(_cfg.DISULFIDE_SUGGESTION_CUTOFF),
+              sep='\n')
 
         disulf_idxpairs = pdbcheck.confirm_disulfides(pdbstruct)
 
