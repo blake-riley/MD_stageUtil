@@ -62,9 +62,9 @@ def tl_crosslink_disulfides(proc, pdbstruct, disulf_idxpairs):
 
         print(f"    ({chn0})//{res0.name}`{res0.original_resid} -- ({chn1})//{res1.name}`{res1.original_resid}")
         tlcommands.append(f"desc \"({chn0})//{res0.name}`{res0.original_resid} -- ({chn1})//{res1.name}`{res1.original_resid}\"")
-        tlcommands.append(f"crosslink mol.{res0.index+1} send mol.{res1.index+1} send")
-        tlcommands.append(f"desc mol.{res0.index+1}.SG")
-        tlcommands.append(f"desc mol.{res1.index+1}.SG")
+        tlcommands.append(f"crosslink mol.{atm0.resid+1} send mol.{atm1.resid+1} send")
+        tlcommands.append(f"desc mol.{atm0.resid+1}.SG")
+        tlcommands.append(f"desc mol.{atm1.resid+1}.SG")
         tlcommands.append("desc \"\"")
 
         retval = []
