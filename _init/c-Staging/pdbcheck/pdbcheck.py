@@ -62,7 +62,7 @@ def check_missing_heavy_atoms(pdbstruct):
             n_heavy_atoms = len(heavy_atoms)
             n_missing = pdb4amber.residue.HEAVY_ATOM_DICT[residue.name] - n_heavy_atoms
             if n_missing > 0:
-                residue_collection.append([residue, n_missing])
+                missing_atom_residues.append([residue, n_missing])
 
     if missing_atom_residues:
         print("  Missing heavy atom(s) in the following residues:")
