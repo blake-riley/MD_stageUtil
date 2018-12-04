@@ -22,11 +22,7 @@
 source /usr/share/Modules/init/bash
 module purge
 
-module load gcc/5.4.0 \
-            python/3.6.1-gcc5.4 \
-            cuda/8.0 \
-            openmpi/2.1.0-gcc5.4 \
-            amber/16
+module load amber/18
 
 module -l list
 
