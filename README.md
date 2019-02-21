@@ -28,6 +28,7 @@ There are multiple ways of doing things at each step. These different ways are l
     - initial_pdb: set to the location of your initial input pdb file.
     - user_email: set to your Monash email address.
     - host: set to "Kronos", "Monarch", or whichever compute resource you want to run your MD.
+    - topology/coordinates: replace with file names for manually generated tleap output.
 5. Create a Python 3 virtualenvironment in which you can install the required packages for this project.  
     a. (With `pyenv`)  
         - Create a virtualenv: `pyenv virtualenv 3.6.6 mdprojecttemplate-3.6.6`  
