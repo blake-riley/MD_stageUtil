@@ -17,7 +17,7 @@ def main(config_file):
     print(f"file:        {config_file.name}")
 
     try:
-        config = yaml.load(config_file)
+        config = yaml.load(config_file, Loader=yaml.SafeLoader)
         config_file.close()
     except Exception as e:
         raise e
