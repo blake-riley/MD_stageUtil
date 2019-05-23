@@ -25,10 +25,11 @@ There are multiple ways of doing things at each step. These different ways are l
 2. Copy the .pdb file of the system for which you wish to run MD into the 'MD_Project_Template' folder.
 3. Create a copy of `templateconfig.yaml`, and call it something sensible: `SYSTEM.NAME.yaml`.
 4. Edit the `SYSTEM.NAME.yaml` file in your favourite text editor to set the desired parameters for the MD you wish to perform. Most parameters can be left as their default values, but the following MUST be changed:
-    - initial_pdb: set to the location of your initial input pdb file.
-    - user_email: set to your Monash email address.
-    - host: set to "Kronos", "Monarch", or whichever compute resource you want to run your MD.
-    - topology/coordinates: replace with file names for manually generated tleap output.
+    - `initial_pdb`: set to the location of your initial input pdb file.
+    - `user_email`: set to your Monash email address.
+    - `host`: set to "Kronos", "Monarch", or whichever compute resource you want to run your MD.
+    a. If you want stageUtil to run tleap on your behalf, and auto-generate topology/coordinate files: you MUST leave the `topology` & `coordinates` parameters as `~`.
+    b. Or, if you have prepared a .prmtop/crd files by manually running tleap already, then you should set the `topology` & `coordinates` parameters to the location of your files.
 5. Create a Python 3 virtualenvironment in which you can install the required packages for this project.  
     a. (With `pyenv`)  
         - Create a virtualenv: `pyenv virtualenv 3.6.6 mdprojecttemplate-3.6.6`  
